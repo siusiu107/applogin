@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>기기 코드 로그인</title>
 
-  <!-- Firebase compat SDK (v9) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-
   <style>
     body {
       margin: 0;
@@ -97,25 +93,38 @@
     <p id="status"></p>
   </div>
 
-  <script>
-    // TODO: 여기에 실제 Firebase 웹 설정을 넣으세요.
-    // (게임에서 사용 중인 firebaseConfig와 동일하게 맞추면 됩니다.)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-    };
-    firebase.initializeApp(firebaseConfig);
+  <script type="module">
+    // Firebase SDK import (v12)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-    const provider = new firebase.auth.GoogleAuthProvider();
+    // Firebase 설정 (네가 준 config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAIrsnUYEBG3cqbPrKD_eejOdtsCDjYG9k",
+      authDomain: "siu-studio.firebaseapp.com",
+      databaseURL: "https://siu-studio-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "siu-studio",
+      storageBucket: "siu-studio.firebasestorage.app",
+      messagingSenderId: "830887143444",
+      appId: "1:830887143444:web:70b45fc12140e893c31f01",
+      measurementId: "G-1Y090YJDB6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
     const codeInput = document.getElementById('codeInput');
     const btn = document.getElementById('btnGoogleLogin');
     const statusEl = document.getElementById('status');
 
-    function setStatus(msg) {
+    const setStatus = (msg) => {
       statusEl.textContent = msg;
-    }
+    };
 
     btn.addEventListener('click', async () => {
       const rawCode = codeInput.value.trim();
@@ -129,7 +138,8 @@
       setStatus('구글 로그인 창을 여는 중입니다...');
 
       try {
-        const result = await firebase.auth().signInWithPopup(provider);
+        // 구글 로그인 팝업
+        const result = await signInWithPopup(auth, provider);
         const user = result.user;
         const idToken = await user.getIdToken();
 
@@ -150,7 +160,7 @@
         }
       } catch (err) {
         console.error(err);
-        setStatus('로그인 중 오류가 발생했습니다. 다시 시도해 주세요.');
+        setStatus('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
       } finally {
         btn.disabled = false;
       }
