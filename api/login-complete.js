@@ -4,8 +4,18 @@ import admin from './_firebaseAdmin';
 const db = admin.database();
 
 export default async function handler(req, res) {
+  // ✅ CORS 설정
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
+    res.setHeader('Allow', 'POST, OPTIONS');
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
@@ -45,7 +55,7 @@ export default async function handler(req, res) {
       return;
     }
 
-    // 3) 앱(WebView)에서 사용할 customToken 생성
+    // 3) WebView에서 사용할 customToken 생성
     const customToken = await admin.auth().createCustomToken(uid);
 
     // 4) 세션 업데이트
