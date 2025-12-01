@@ -126,13 +126,23 @@
       statusEl.textContent = msg;
     };
 
-    btn.addEventListener('click', async () => {
-      const rawCode = codeInput.value.trim();
-      if (!rawCode) {
+    const isValidCode = (value) => /^[A-Z0-9]{4,8}$/.test(value);
+    const normalizeCode = (value) => (value || '').trim().toUpperCase();
+
+    const loginWithCode = async (rawCode) => {
+      const code = normalizeCode(rawCode);
+
+      if (!code) {
         alert('코드를 입력하세요.');
         return;
       }
-      const code = rawCode.toUpperCase();
+
+      if (!isValidCode(code)) {
+        setStatus('(No code found)');
+        codeInput.focus();
+        codeInput.select();
+        return;
+      }
 
       btn.disabled = true;
       setStatus('구글 로그인 창을 여는 중입니다...');
@@ -164,7 +174,21 @@
       } finally {
         btn.disabled = false;
       }
-    });
+    };
+
+    btn.addEventListener('click', () => loginWithCode(codeInput.value));
+
+    const autoCode = normalizeCode(new URLSearchParams(window.location.search).get('code'));
+
+    if (!autoCode) {
+      setStatus('(No code found)');
+    } else if (isValidCode(autoCode)) {
+      codeInput.value = autoCode;
+      setStatus('코드를 감지했습니다. 자동으로 로그인합니다...');
+      loginWithCode(autoCode);
+    } else {
+      setStatus('(No code found)');
+    }
   </script>
 </body>
 </html>
