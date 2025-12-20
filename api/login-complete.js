@@ -69,6 +69,10 @@ export default async function handler(req, res) {
     res.status(200).json({ ok: true });
   } catch (err) {
     console.error(err);
+    if (err?.code === 'auth/user-disabled' || err?.errorInfo?.code === 'auth/user-disabled') {
+      res.status(403).json({ error: 'user_disabled' });
+      return;
+    }
     res.status(500).json({ error: 'internal_error' });
   }
 }

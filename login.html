@@ -122,6 +122,9 @@
     const btn = document.getElementById('btnGoogleLogin');
     const statusEl = document.getElementById('status');
 
+    const disabledAccountMessage =
+      '이용약관 위반으로 계정이 정지되었습니다. 오탐으로 의심되면 appeals@siustudio.me로 문의해주세요.';
+
     const setStatus = (msg) => {
       statusEl.textContent = msg;
     };
@@ -166,10 +169,18 @@
           setStatus('로그인이 완료되었습니다. 앱으로 돌아가면 자동으로 연결됩니다.');
         } else {
           console.error(data);
+          if (data.error === 'user_disabled') {
+            setStatus(disabledAccountMessage);
+            return;
+          }
           setStatus('오류: ' + (data.error || '알 수 없는 오류'));
         }
       } catch (err) {
         console.error(err);
+        if (err?.code === 'auth/user-disabled') {
+          setStatus(disabledAccountMessage);
+          return;
+        }
         setStatus('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
       } finally {
         btn.disabled = false;
