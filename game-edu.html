@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>태양계 탐험 게임 - 교육형</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "Noto Sans KR", system-ui, sans-serif;
+      background: radial-gradient(circle at top, #0b1d3a, #04070f 70%);
+      color: #eef3ff;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 32px 24px 16px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 2.4rem;
+      letter-spacing: 0.02em;
+    }
+
+    header p {
+      margin: 0;
+      color: #c7d6ff;
+    }
+
+    main {
+      display: grid;
+      gap: 24px;
+      padding: 0 24px 40px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      align-items: start;
+    }
+
+    section {
+      background: rgba(5, 12, 24, 0.75);
+      border: 1px solid rgba(110, 145, 255, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+    }
+
+    .solar-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .planet-card {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: rgba(20, 31, 58, 0.8);
+      border-radius: 12px;
+      border: 1px solid rgba(103, 134, 255, 0.4);
+    }
+
+    .planet-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+    }
+
+    .planet-info strong {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .planet-info span {
+      font-size: 0.9rem;
+      color: #c9d8ff;
+    }
+
+    .game-panel {
+      display: grid;
+      gap: 16px;
+    }
+
+    .clicker-panel {
+      display: grid;
+      gap: 16px;
+    }
+
+    .click-button {
+      width: 100%;
+      padding: 18px 24px;
+      font-size: 1.1rem;
+      border-radius: 16px;
+      background: linear-gradient(120deg, #ffb347, #ff6f91);
+      box-shadow: 0 12px 24px rgba(255, 111, 145, 0.35);
+    }
+
+    .store-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .store-card {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(110, 145, 255, 0.4);
+      background: rgba(20, 31, 58, 0.8);
+    }
+
+    .store-card header {
+      padding: 0;
+      text-align: left;
+    }
+
+    .store-card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .store-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #c9d8ff;
+    }
+
+    .store-status {
+      font-weight: 600;
+      color: #7ee7a3;
+    }
+
+    .store-status.locked {
+      color: #ffc87a;
+    }
+
+    .purchase-quiz {
+      border-radius: 12px;
+      border: 1px dashed rgba(165, 186, 255, 0.5);
+      padding: 12px;
+      background: rgba(15, 26, 52, 0.85);
+    }
+
+    .purchase-quiz h3 {
+      margin-top: 0;
+    }
+
+    .purchase-quiz .quiz-option {
+      margin-top: 8px;
+    }
+
+    .order-display {
+      min-height: 90px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(165, 186, 255, 0.5);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .order-display span {
+      background: rgba(98, 122, 220, 0.3);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      background: #2d59ff;
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(45, 89, 255, 0.35);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      box-shadow: none;
+    }
+
+    .score-board {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(29, 48, 95, 0.7);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(110, 145, 255, 0.4);
+    }
+
+    .quiz {
+      display: grid;
+      gap: 12px;
+    }
+
+    .quiz-option {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(110, 145, 255, 0.4);
+      background: rgba(22, 35, 65, 0.8);
+      cursor: pointer;
+      transition: border 0.15s ease, background 0.15s ease;
+    }
+
+    .quiz-option.correct {
+      border-color: #55d68a;
+      background: rgba(28, 88, 56, 0.8);
+    }
+
+    .quiz-option.wrong {
+      border-color: #ff6b6b;
+      background: rgba(92, 30, 30, 0.8);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px 24px 40px;
+      color: #a9b9e5;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>태양계 탐험 게임</h1>
+    <p>학습과 미션을 함께! 행성 정보를 읽고 순서를 맞히며 점수를 얻어보세요.</p>
+  </header>
+
+  <main>
+    <section aria-labelledby="planet-guide">
+      <h2 id="planet-guide">행성 가이드</h2>
+      <div class="solar-list">
+        <div class="planet-card">
+          <div class="planet-dot" style="background:#f3a43b"></div>
+          <div class="planet-info">
+            <strong>수성</strong>
+            <span>태양과 가장 가까운 행성, 하루가 길고 대기가 얇아요.</span>
+          </div>
+        </div>
+        <div class="planet-card">
+          <div class="planet-dot" style="background:#e7c36a"></div>
+          <div class="planet-info">
+            <strong>금성</strong>
+            <span>두꺼운 대기 때문에 온실효과가 강하며 지구와 크기가 비슷합니다.</span>
+          </div>
+        </div>
+        <div class="planet-card">
+          <div class="planet-dot" style="background:#5cb5ff"></div>
+          <div class="planet-info">
+            <strong>지구</strong>
+            <span>액체 물과 생명체가 있는 유일한 행성, 바다는 파란빛을 띱니다.</span>
+          </div>
+        </div>
+        <div class="planet-card">
+          <div class="planet-dot" style="background:#f36b4c"></div>
+          <div class="planet-info">
+            <strong>화성</strong>
+            <span>붉은색 토양 때문에 붉은 행성이라 불리며 탐사 로봇이 활약 중이에요.</span>
+          </div>
+        </div>
+        <div class="planet-card">
+          <div class="planet-dot" style="background:#f5d16c"></div>
+          <div class="planet-info">
+            <strong>목성</strong>
+            <span>가장 큰 행성으로 대적점이라는 거대한 폭풍이 있어요.</span>
+          </div>
+        </div>
+        <div class="planet-card">
+          <div class="planet-dot" style="background:#f0e0b5"></div>
+          <div class="planet-info">
+            <strong>토성</strong>
+            <span>아름다운 고리로 유명하며, 수많은 얼음 조각이 고리를 이룹니다.</span>
+          </div>
+        </div>
+        <div class="planet-card">
+          <div class="planet-dot" style="background:#8bd7ff"></div>
+          <div class="planet-info">
+            <strong>천왕성</strong>
+            <span>옆으로 누운 자전축을 가진 얼음 행성입니다.</span>
+          </div>
+        </div>
+        <div class="planet-card">
+          <div class="planet-dot" style="background:#6bb2ff"></div>
+          <div class="planet-info">
+            <strong>해왕성</strong>
+            <span>강한 바람과 푸른색 대기가 특징인 가장 먼 행성입니다.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="clicker-game">
+      <h2 id="clicker-game">미션 0: 에너지 클리커</h2>
+      <div class="clicker-panel">
+        <p>클릭해서 에너지를 모으고, 행성 기지를 구매해보세요. 행성을 살 때는 퀴즈를 풀어야 합니다!</p>
+        <button class="click-button" id="clicker-button">에너지 모으기</button>
+        <div class="score-board">
+          <span>현재 에너지: <strong id="energy-score">0</strong></span>
+          <span>보유 행성: <strong id="owned-count">0</strong> / 8</span>
+        </div>
+        <div class="store-list" id="store-list"></div>
+        <div class="purchase-quiz" id="purchase-quiz">
+          <h3>행성 구매 퀴즈</h3>
+          <p id="purchase-question">행성을 선택하면 퀴즈가 여기 표시됩니다.</p>
+          <div id="purchase-options"></div>
+          <p id="purchase-feedback"></p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="order-game">
+      <h2 id="order-game">미션 1: 행성 순서 맞히기</h2>
+      <div class="game-panel">
+        <p>태양에서 가까운 순서대로 버튼을 눌러 행성을 배치해보세요!</p>
+        <div class="button-row" id="planet-buttons"></div>
+        <div class="order-display" id="order-display"></div>
+        <div class="score-board">
+          <span>순서 점수: <strong id="order-score">0</strong>점</span>
+          <div>
+            <button id="reset-order">다시하기</button>
+            <button id="check-order">채점하기</button>
+          </div>
+        </div>
+        <p id="order-feedback"></p>
+      </div>
+    </section>
+
+    <section aria-labelledby="quiz-game">
+      <h2 id="quiz-game">미션 2: 행성 퀴즈</h2>
+      <div class="quiz">
+        <p id="quiz-question"></p>
+        <div id="quiz-options"></div>
+        <div class="score-board">
+          <span>퀴즈 점수: <strong id="quiz-score">0</strong>점</span>
+          <button id="next-question">다음 문제</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    학습 팁: 행성의 특징을 기억하면 순서와 퀴즈를 더 쉽게 풀 수 있어요!
+  </footer>
+
+  <script>
+    const planets = [
+      "수성",
+      "금성",
+      "지구",
+      "화성",
+      "목성",
+      "토성",
+      "천왕성",
+      "해왕성",
+    ];
+
+    const storePlanets = [
+      {
+        name: "수성",
+        cost: 30,
+        question: "수성은 태양과 어떤 관계가 있을까요?",
+        options: ["가장 가까운 행성", "가장 큰 행성", "가장 차가운 행성"],
+        answer: "가장 가까운 행성",
+        fact: "수성은 태양과 가장 가까워 표면 온도 변화가 큽니다.",
+      },
+      {
+        name: "금성",
+        cost: 40,
+        question: "금성의 대기에서 강하게 나타나는 현상은?",
+        options: ["온실효과", "빙하기", "극광 폭풍"],
+        answer: "온실효과",
+        fact: "금성은 두꺼운 대기로 인해 온실효과가 매우 강합니다.",
+      },
+      {
+        name: "지구",
+        cost: 50,
+        question: "지구가 특별한 이유는 무엇일까요?",
+        options: ["액체 물", "고리", "거대한 붉은 점"],
+        answer: "액체 물",
+        fact: "지구에는 액체 물과 생명체가 존재합니다.",
+      },
+      {
+        name: "화성",
+        cost: 60,
+        question: "화성이 붉게 보이는 이유는?",
+        options: ["산화철", "얼음", "구름"],
+        answer: "산화철",
+        fact: "화성의 붉은색은 산화철(녹) 때문입니다.",
+      },
+      {
+        name: "목성",
+        cost: 80,
+        question: "목성의 대표적인 특징은?",
+        options: ["대적점 폭풍", "푸른 고리", "옆으로 누운 자전축"],
+        answer: "대적점 폭풍",
+        fact: "목성에는 수백 년 동안 지속된 대적점 폭풍이 있습니다.",
+      },
+      {
+        name: "토성",
+        cost: 90,
+        question: "토성이 유명한 이유는?",
+        options: ["아름다운 고리", "가장 작은 크기", "가장 뜨거운 표면"],
+        answer: "아름다운 고리",
+        fact: "토성의 고리는 얼음과 암석 조각으로 이루어져 있습니다.",
+      },
+      {
+        name: "천왕성",
+        cost: 100,
+        question: "천왕성의 자전축은 어떤 특징이 있나요?",
+        options: ["옆으로 누움", "세로로 곧음", "거꾸로 회전"],
+        answer: "옆으로 누움",
+        fact: "천왕성의 자전축은 크게 기울어져 옆으로 누운 모습입니다.",
+      },
+      {
+        name: "해왕성",
+        cost: 110,
+        question: "해왕성의 대기 특징은?",
+        options: ["강한 바람", "붉은 사막", "녹색 고리"],
+        answer: "강한 바람",
+        fact: "해왕성은 태양계에서 가장 강한 바람이 관측됩니다.",
+      },
+    ];
+
+    const energyScore = document.getElementById("energy-score");
+    const ownedCount = document.getElementById("owned-count");
+    const clickerButton = document.getElementById("clicker-button");
+    const storeList = document.getElementById("store-list");
+    const purchaseQuiz = document.getElementById("purchase-quiz");
+    const purchaseQuestion = document.getElementById("purchase-question");
+    const purchaseOptions = document.getElementById("purchase-options");
+    const purchaseFeedback = document.getElementById("purchase-feedback");
+
+    let energy = 0;
+    let ownedPlanets = new Set();
+    let pendingPurchase = null;
+
+    function updateEnergyDisplay() {
+      energyScore.textContent = energy.toString();
+      ownedCount.textContent = ownedPlanets.size.toString();
+    }
+
+    function renderStore() {
+      storeList.innerHTML = "";
+      storePlanets.forEach((planet) => {
+        const card = document.createElement("div");
+        card.className = "store-card";
+
+        const header = document.createElement("header");
+        const title = document.createElement("h3");
+        title.textContent = planet.name;
+        header.appendChild(title);
+        card.appendChild(header);
+
+        const meta = document.createElement("div");
+        meta.className = "store-meta";
+        const costText = document.createElement("span");
+        costText.textContent = `필요 에너지: ${planet.cost}`;
+        const status = document.createElement("span");
+        status.className = ownedPlanets.has(planet.name) ? "store-status" : "store-status locked";
+        status.textContent = ownedPlanets.has(planet.name) ? "구매 완료" : "퀴즈 필요";
+        meta.appendChild(costText);
+        meta.appendChild(status);
+        card.appendChild(meta);
+
+        const action = document.createElement("button");
+        action.textContent = ownedPlanets.has(planet.name) ? "보유 중" : "구매하기";
+        action.disabled = ownedPlanets.has(planet.name);
+        action.addEventListener("click", () => startPurchaseQuiz(planet));
+        card.appendChild(action);
+
+        storeList.appendChild(card);
+      });
+    }
+
+    function startPurchaseQuiz(planet) {
+      if (ownedPlanets.has(planet.name)) {
+        return;
+      }
+      if (energy < planet.cost) {
+        purchaseQuestion.textContent = "에너지가 부족합니다. 더 모아서 다시 도전해요!";
+        purchaseOptions.innerHTML = "";
+        purchaseFeedback.textContent = "";
+        pendingPurchase = null;
+        return;
+      }
+
+      pendingPurchase = planet;
+      purchaseFeedback.textContent = "";
+      purchaseQuestion.textContent = `${planet.name} 구매 퀴즈: ${planet.question}`;
+      purchaseOptions.innerHTML = "";
+      purchaseOptions.style.pointerEvents = "auto";
+
+      planet.options.forEach((option) => {
+        const optionButton = document.createElement("div");
+        optionButton.className = "quiz-option";
+        optionButton.textContent = option;
+        optionButton.addEventListener("click", () => evaluatePurchase(optionButton, option));
+        purchaseOptions.appendChild(optionButton);
+      });
+    }
+
+    function evaluatePurchase(optionButton, selected) {
+      if (!pendingPurchase) {
+        return;
+      }
+      purchaseOptions.style.pointerEvents = "none";
+      if (selected === pendingPurchase.answer) {
+        energy -= pendingPurchase.cost;
+        ownedPlanets.add(pendingPurchase.name);
+        optionButton.classList.add("correct");
+        purchaseFeedback.textContent = `정답! ${pendingPurchase.fact}`;
+        renderStore();
+        updateEnergyDisplay();
+      } else {
+        optionButton.classList.add("wrong");
+        purchaseFeedback.textContent = "아쉽네요! 다시 도전해보세요.";
+      }
+    }
+
+    const planetButtons = document.getElementById("planet-buttons");
+    const orderDisplay = document.getElementById("order-display");
+    const orderScore = document.getElementById("order-score");
+    const orderFeedback = document.getElementById("order-feedback");
+
+    let selectedOrder = [];
+
+    function renderPlanetButtons() {
+      planetButtons.innerHTML = "";
+      const shuffled = [...planets].sort(() => Math.random() - 0.5);
+      shuffled.forEach((planet) => {
+        const button = document.createElement("button");
+        button.textContent = planet;
+        button.addEventListener("click", () => {
+          if (selectedOrder.includes(planet)) {
+            return;
+          }
+          selectedOrder.push(planet);
+          updateOrderDisplay();
+        });
+        planetButtons.appendChild(button);
+      });
+    }
+
+    function updateOrderDisplay() {
+      orderDisplay.innerHTML = "";
+      selectedOrder.forEach((planet) => {
+        const chip = document.createElement("span");
+        chip.textContent = planet;
+        orderDisplay.appendChild(chip);
+      });
+    }
+
+    function resetOrder() {
+      selectedOrder = [];
+      orderFeedback.textContent = "";
+      orderScore.textContent = "0";
+      updateOrderDisplay();
+      renderPlanetButtons();
+    }
+
+    function checkOrder() {
+      let score = 0;
+      selectedOrder.forEach((planet, index) => {
+        if (planets[index] === planet) {
+          score += 10;
+        }
+      });
+
+      orderScore.textContent = score.toString();
+
+      if (score === planets.length * 10) {
+        orderFeedback.textContent = "완벽해요! 태양계 순서를 정확하게 맞췄어요.";
+      } else {
+        orderFeedback.textContent = "좋아요! 행성의 순서를 다시 확인해보세요.";
+      }
+    }
+
+    document.getElementById("reset-order").addEventListener("click", resetOrder);
+    document.getElementById("check-order").addEventListener("click", checkOrder);
+
+    const quizData = [
+      {
+        question: "가장 큰 행성은 무엇일까요?",
+        options: ["목성", "화성", "금성"],
+        answer: "목성",
+        fact: "목성은 태양계에서 가장 큰 행성으로 강한 중력을 가지고 있어요.",
+      },
+      {
+        question: "고리가 있는 행성은 무엇일까요?",
+        options: ["토성", "지구", "수성"],
+        answer: "토성",
+        fact: "토성의 고리는 수많은 얼음과 암석 조각으로 이루어져 있습니다.",
+      },
+      {
+        question: "붉은 행성으로 불리는 행성은?",
+        options: ["화성", "금성", "천왕성"],
+        answer: "화성",
+        fact: "화성의 붉은색은 산화철 때문에 나타나요.",
+      },
+      {
+        question: "옆으로 누운 자전축을 가진 행성은?",
+        options: ["천왕성", "해왕성", "지구"],
+        answer: "천왕성",
+        fact: "천왕성의 자전축은 98도 이상 기울어져 있습니다.",
+      },
+    ];
+
+    const quizQuestion = document.getElementById("quiz-question");
+    const quizOptions = document.getElementById("quiz-options");
+    const quizScore = document.getElementById("quiz-score");
+    const nextQuestion = document.getElementById("next-question");
+
+    let quizIndex = 0;
+    let quizPoints = 0;
+
+    function loadQuiz() {
+      const data = quizData[quizIndex];
+      quizQuestion.textContent = data.question;
+      quizOptions.innerHTML = "";
+      quizOptions.style.pointerEvents = "auto";
+
+      data.options.forEach((option) => {
+        const optionButton = document.createElement("div");
+        optionButton.className = "quiz-option";
+        optionButton.textContent = option;
+        optionButton.addEventListener("click", () => selectAnswer(optionButton, option));
+        quizOptions.appendChild(optionButton);
+      });
+    }
+
+    function selectAnswer(optionButton, selected) {
+      const data = quizData[quizIndex];
+      quizOptions.style.pointerEvents = "none";
+
+      if (selected === data.answer) {
+        quizPoints += 10;
+        optionButton.classList.add("correct");
+      } else {
+        optionButton.classList.add("wrong");
+      }
+
+      quizScore.textContent = quizPoints.toString();
+      const fact = document.createElement("p");
+      fact.textContent = data.fact;
+      quizOptions.appendChild(fact);
+    }
+
+    nextQuestion.addEventListener("click", () => {
+      quizIndex = (quizIndex + 1) % quizData.length;
+      loadQuiz();
+    });
+
+    clickerButton.addEventListener("click", () => {
+      energy += 5;
+      updateEnergyDisplay();
+    });
+
+    renderStore();
+    updateEnergyDisplay();
+    renderPlanetButtons();
+    loadQuiz();
+  </script>
+</body>
+</html>
